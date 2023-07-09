@@ -1,0 +1,47 @@
+#
+# DESPLIEGUE DE MICROSERVICIOS "FIT OR FAT"
+#
+# Definición del espacio de nombre
+kind: Namespace
+apiVersion: v1
+metadata:
+  name: fitorfat
+---
+# Despliegue del microservicio HU-18 CORE "Comenzar rutina de ejercicios"
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hu18-desp
+  namespace: fitorfat
+  labels:
+    app: hu18
+spec:
+  selector:
+    matchLabels:
+      app: hu18
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: hu18
+    spec:
+      containers:
+      - name: hu18
+        image: fitorfatacr.azurecr.io/hu18:latest
+        ports:
+        - containerPort: 80
+---
+# Servicio "ClusterIP" para poder acceder al microservicio HU-18 CORE
+apiVersion: v1
+kind: Service
+metadata:
+    name: hu18-serv
+    namespace: fitorfat
+spec:
+    selector:
+      app: hu18
+    type: ClusterIP
+    ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
